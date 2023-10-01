@@ -6,7 +6,7 @@ import { assertNumber, assertString, assertBoolean, valToJs, jsToVal, assertFunc
 import { AiScriptRuntimeError } from '../../error.js';
 import type { Value } from '../value.js';
 
-export const std: Record<string, Value> = {
+export const std = {
 	'help': STR('SEE: https://github.com/syuilo/aiscript/blob/master/docs/get-started.md'),
 
 	//#region Core
@@ -573,4 +573,4 @@ export const std: Record<string, Value> = {
 		});
 	}),
 	//#endregion
-};
+} as const satisfies Record<string, Value>;

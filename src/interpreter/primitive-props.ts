@@ -6,9 +6,7 @@ import type { Value, VArr, VFn, VNum, VStr, VError } from './value.js';
 
 type VWithPP = VNum|VStr|VArr|VError;
 
-const PRIMITIVE_PROPS: {
-	[key in VWithPP['type']]: { [key: string]: (target: Value) => Value }
-} = {
+export const PRIMITIVE_PROPS = {
 	num: {
 		to_str: (target: VNum): VFn => FN_NATIVE(async (_, _opts) => {
 			return STR(target.value.toString());
@@ -227,11 +225,13 @@ const PRIMITIVE_PROPS: {
 
 		info: (target: VError): Value => target.info ?? NULL,
 	},
-} as const;
+} as const satisfies {
+	[key in VWithPP['type']]: Record<string, (target: Value & {type: key}) => Value>;
+};
 
 export function getPrimProp(target: Value, name: string): Value {
 	if (Object.hasOwn(PRIMITIVE_PROPS, target.type)) {
-		const props = PRIMITIVE_PROPS[target.type as VWithPP['type']];
+		const props = PRIMITIVE_PROPS[target.type as keyof typeof PRIMITIVE_PROPS] as Record<string, (target: Value) => Value>;
 		if (Object.hasOwn(props, name)) {
 			return props[name]!(target);
 		} else {
