@@ -4,90 +4,88 @@
 ## 標準定数・標準関数について
 Aiscriptで最初から定義されていてどこでも使える定数・関数を指します。  
 standardを省略してstd定数/関数とも呼ばれています。
-## 書式
-> #Core:v
-
-`Core:v`という標準定数を表します。
-> @Core:type(_v_: value): str
-
-`Core:type`という標準関数を表します。  
-`v`という名のvalue型（つまり任意の型）の引数を一つとり、str型（文字列型）の値を返します。
 
 # 一覧
 
-## std
-### @print(_message_: str): void
+## IO
+入出力関数です。これらには名前空間が与えられていません。
+
+### print(_message_)
+_message_: str  
+返り値: void  
 画面に文字列を表示します。  
 
-### @readline(_message_: str): str
-文字列の入力を受け付けます。  
+### readline(_message_)
+_message_: str  
+返り値: str  
+文字列の入力を受け付けます。入力が中断されると空文字列`""`が返されます。  
 
 ## :: Core
+AiScriptの中心的な機能を担う定数・関数は`Core:`の名前空間を与えられています。
 
-### #Core:v
-型: `str`  
+### Core:v
+型: str  
 AiScriptのバージョンです。  
 
-### @Core:type(_v_: value): str
+### Core:type(_v_)
+_v_: any  
+返り値: str  
 値の型名を取得します。  
 
-### @Core:to_str(_v_: value): str
+### Core:to_str(_v_)
+_v_: any  
+返り値: str  
 値を表す文字列を取得します。  
 
-### @Core:sleep(_time_: value): void
-指定時間（ミリ秒）待機します。
+### Core:sleep(_time_)
+_time_: any  
+返り値: void  
+指定時間（ミリ秒）待機します。  
+
 ## :: Util
 
-### @Util:uuid(): str
+### Util:uuid()
+返り値: str  
 新しいUUIDを生成します。  
 
 ## :: Json
+JSONを扱う関数には`Json:`の名前空間が割り当てられています。  
 
-### @Json:stringify(_v_: value): str
+### Json:stringify(_v_)
+_v_: any  
+返り値: str  
 JSONを生成します。  
 
-### @Json:parse(_json_: str): value
-JSONをパースします。 引数がJSONとしてパース可能性でない場合、エラー型の値（`name`=`'not_json'`）を返します。 
+### Json:parse(_json_)
+_json_: str  
+返り値: any  
+JSONをパースします。 引数がJSONとしてパース可能でない場合、エラー型の値（`name`=`'not_json'`）を返します。 
 
-### @Json:parsable(_str_: str): bool
-文字列がJSONとしてパース可能であるかの判定を行います。歴史的理由により存在しています 
+### Json:parsable(_str_)
+_str_: str  
+返り値: bool  
+文字列がJSONとしてパース可能であるかの判定を行います。  
+パフォーマンス上の理由から非推奨であり、後々廃止される可能性があります。  
 
 ## :: Date
+時刻の取得・変換に関する関数群です。  
 
-### @Date:now(): num
-現在時刻を取得します。  
+### Date:now()
+返り値: num  
+現在時刻を特殊な数値の形で取得します。  
+この数値は主に下記の変換関数に渡して使用されます。  
+技術的には、この数値はJavaScriptの[Date.now()](https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Global_Objects/Date/now)で得られるものと同一です。  
 
-### @Date:year(_date_?: num): num
-時刻の年を取得します。  
-_date_ を渡した場合、_date_に対応する年、  
-渡していない場合は現在時刻の年が返されます。    
+### 変換関数(_date_?)
+`Date:year`、`Date:month`、`Date:day`、`Date:hour`、`Date:minute`、`Date:second`の６つがあります。引数・返り値の型はすべて  
+_date_?: num  
+返り値: num  
+です。  
+_date_ が与えられた場合、その数値が表す時刻のそれぞれ年・月・日・時・分・秒を返します。与えられなかった場合は現在のそれを返します。  
 
-### @Date:month(_date_?: num): num
-現在時刻の月を取得します。  
-_date_ を渡した場合、_date_に対応する月、  
-渡していない場合は現在時刻の月が返されます。    
-
-### @Date:day(_date_?: num): num
-現在時刻の日を取得します。  
-_date_ を渡した場合、_date_に対応する日、  
-渡していない場合は現在時刻の日が返されます。    
-
-### @Date:hour(_date_?: num): num
-現在時刻の時を取得します。  
-_date_ を渡した場合、_date_に対応する時、  
-渡していない場合は現在時刻の時が返されます。    
-
-### @Date:minute(_date_?: num): num
-現在時刻の分を取得します。  
-_date_ を渡した場合、_date_に対応する分、  
-渡していない場合は現在時刻の分が返されます。    
-
-### @Date:second(_date_?: num): num
-現在時刻の秒を取得します。  
-_date_ を渡した場合、_date_に対応する秒、  
-渡していない場合は現在時刻の秒が返されます。    
-
-### @Date:parse(_date_: str): num
+### Date:parse(_date_)
+_date_: str  
+返り値: num  
 
 ## :: Math
 数が多いため専用のページになっています。→[std-math.md](std-math.md)
