@@ -113,6 +113,14 @@ const infoTable: Record<string, InfixTree['info']> = {
 		}) as Cst.Or,
 		priority: 3,
 	},
+	'??': {
+		mapFn: infix => ({
+			type: 'errorOr',
+			left: treeToNode(infix.left),
+			right: treeToNode(infix.right),
+		}) as Cst.ErrorOr,
+		priority: 3,
+	},
 };
 
 /**

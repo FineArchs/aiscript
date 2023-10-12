@@ -526,6 +526,13 @@ export const std: Record<string, Value> = {
 	*/
 	//#endregion
 
+	//#region Error
+	'Error:new': FN_NATIVE(([a, b]) => {
+		assertString(a);
+		return ERROR(a.value, b);
+	}),
+	//#endregion
+	
 	//#region Async
 	'Async:interval': FN_NATIVE(async ([interval, callback, immediate], opts) => {
 		assertNumber(interval);

@@ -552,6 +552,19 @@ export class Interpreter {
 				}
 			}
 
+			case 'errorOr': {
+				const leftValue = await this._eval(node.left, scope);
+				expectAny(leftValue);
+
+				if (leftValue.type !== 'error') {
+					return leftValue;
+				} else {
+					const rightValue = await this._eval(node.right, scope);
+					expectAny(rightValue);
+					return rightValue;
+				}
+			}
+
 			default: {
 				throw new Error('invalid node type');
 			}

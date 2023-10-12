@@ -33,6 +33,7 @@ export type Expression =
 	Not |
 	And |
 	Or |
+	ErrorOr |
 	If |
 	Fn |
 	Match |
@@ -165,6 +166,12 @@ export type And = NodeBase & {
 
 export type Or = NodeBase & {
 	type: 'or';
+	left: Expression;
+	right: Expression;
+}
+
+export type ErrorOr = NodeBase & {
+	type: 'errorOr';
 	left: Expression;
 	right: Expression;
 }

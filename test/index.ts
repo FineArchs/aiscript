@@ -131,39 +131,6 @@ describe('ops', () => {
 			assert.ok(e instanceof AiScriptRuntimeError);
 			return;
 		}
-
-		eq(
-			await exe(`
-				var tmp = null
-
-				@func() {
-					tmp = true
-					return true
-				}
-
-				false && func()
-
-				<: tmp
-			`),
-			NULL
-		)
-
-		eq(
-			await exe(`
-				var tmp = null
-
-				@func() {
-					tmp = true
-					return true
-				}
-
-				true && func()
-
-				<: tmp
-			`),
-			BOOL(true)
-		)
-
 		assert.fail();
 	});
 
@@ -179,40 +146,46 @@ describe('ops', () => {
 			assert.ok(e instanceof AiScriptRuntimeError);
 			return;
 		}
-
-		eq(
-			await exe(`
-				var tmp = null
-
-				@func() {
-					tmp = true
-					return true
-				}
-
-				true || func()
-
-				<: tmp
-			`),
-			NULL
-		)
-
-		eq(
-			await exe(`
-				var tmp = null
-
-				@func() {
-					tmp = true
-					return true
-				}
-
-				false || func()
-
-				<: tmp
-			`),
-			BOOL(true)
-		)
-
 		assert.fail();
+	});
+
+	test.concurrent('??', async () => {
+		eq(await exe('<: ("ai" ?? "chan")'), STR('ai'));
+		eq(await exe('<: ("ai" ?? Error:new("chan"))'), STR('ai'));
+		eq(await exe('<: (Error:new("ai") ?? "chan")'), STR("chan"));
+		eq(await exe('<: (Error:new("ai") ?? Error:new("chan"))'), ERROR("chan"));
+	});
+
+	test.concurrent('short-circuit evaluation of &&, ||, ??', async () => {
+		eq(
+			await exe(`
+				@detect_side_effect(func) {
+					var tmp = null
+					func(@(){
+						tmp = true
+						return true
+					})
+					return tmp
+				}
+
+				<: [
+					@(func){ true && func() }
+					@(func){ false && func() }
+					@(func){ true || func() }
+					@(func){ false || func() }
+					@(func){ 'ai' ?? func() }
+					@(func){ Error:new('ai') ?? func() }
+				].map(detect_side_effect)
+			`),
+			ARR([
+				BOOL(true),
+				NULL,
+				NULL,
+				BOOL(true),
+				NULL,
+				BOOL(true),
+			])
+		);
 	});
 
 	test.concurrent('+', async () => {
