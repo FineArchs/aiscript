@@ -39,7 +39,9 @@ jobs:
         if: failure()
         run: |
           BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo ${BASE_BRANCH}
           HEAD_BRANCH=api-report-$(git rev-parse --short HEAD)
+          echo ${HEAD_BRANCH}
           git config user.email "cicada1003@gmail.com"
           git config user.name "AiScript api report bot"
           git switch -c ${HEAD_BRANCH}
