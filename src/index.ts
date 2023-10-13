@@ -20,3 +20,4 @@ export { PluginType };
 export { Cst };
 export { errors };
 export { Ast };
+export 1 as hoge;
