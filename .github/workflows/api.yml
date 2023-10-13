@@ -38,7 +38,7 @@ jobs:
       - name: Create Pull Request
         if: failure()
         run: |
-          BASE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          BASE_BRANCH=$($ git branch --show-current)
           echo ${BASE_BRANCH}
           HEAD_BRANCH=api-report-$(git rev-parse --short HEAD)
           echo ${HEAD_BRANCH}
