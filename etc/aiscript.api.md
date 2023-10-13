@@ -479,6 +479,9 @@ function getLangVersion(input: string): string | null;
 function hasChainProp<T extends Node_3>(x: T): x is T & ChainProp;
 
 // @public (undocumented)
+export const hoge = 4;
+
+// @public (undocumented)
 type Identifier = NodeBase & {
     type: 'identifier';
     name: string;
