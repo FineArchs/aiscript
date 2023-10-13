@@ -11,6 +11,8 @@ jobs:
   report:
 
     runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout
@@ -32,6 +34,21 @@ jobs:
 
       - name: API report
         run: npm run api-prod
+
+      - name: Create Pull Request
+        if: failure()
+        run: |
+          NEW_BRANCH=api-report-${GITHUB_SHA}
+          git config user.email "cicada1003@gmail.com"
+          git config user.name "AiScript api report bot"
+          git switch -c ${NEW_BRANCH}
+          npm run api
+          git add etc
+          git commit -m'api report'
+          git remote add target ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git
+          git push -u target ${NEW_BRANCH}
+          HEAD_REPO=${{github.event.pull_request.head.repo.full_name}}
+          gh pr create --fill --repo ${HEAD_REPO} -B "${GIT_BRANCH_NAME}"
 
       - name: Show report
         if: always()
