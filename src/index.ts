@@ -20,5 +20,5 @@ export { PluginType };
 export { Cst };
 export { errors };
 export { Ast };
-const hoge = 2;
+const hoge = 3;
 export { hoge };
