@@ -107,7 +107,7 @@ Expr3
 	/ Arr         // "["
 	/ Not         // "!"
 	/ Identifier  // NAME_WITH_NAMESPACE
-	/ "(" _* e:Expr _* ")" { return e; }
+	/ "(" _* expr:Expr _* ")" { return createNode('paren', { expr }); }
 
 // list of static literal
 

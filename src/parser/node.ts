@@ -46,12 +46,13 @@ export type Expression =
 	Obj |
 	Arr |
 	Identifier |
+	Paren |
 	Call | // IR
 	Index | // IR
 	Prop; // IR
 
 const expressionTypes = [
-	'infix', 'if', 'fn', 'match', 'block', 'exists', 'tmpl', 'str', 'num', 'bool', 'null', 'obj', 'arr', 'identifier', 'call', 'index', 'prop',
+	'infix', 'if', 'fn', 'match', 'block', 'exists', 'tmpl', 'str', 'num', 'bool', 'null', 'obj', 'arr', 'identifier', 'paren', 'call', 'index', 'prop',
 ];
 export function isExpression(x: Node): x is Expression {
 	return expressionTypes.includes(x.type);
@@ -247,6 +248,11 @@ export type Arr = NodeBase & ChainProp & {
 export type Identifier = NodeBase & ChainProp & {
 	type: 'identifier';
 	name: string;
+};
+
+export type Paren = NodeBase & ChainProp & {
+	type: 'paren';
+	expr: Expression;
 };
 
 // AST

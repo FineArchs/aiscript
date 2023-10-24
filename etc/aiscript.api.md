@@ -157,6 +157,7 @@ declare namespace Ast {
         Obj,
         Arr,
         Identifier,
+        Paren,
         Call,
         Index,
         Prop,
@@ -313,6 +314,7 @@ declare namespace Cst {
         Obj_2 as Obj,
         Arr_2 as Arr,
         Identifier_2 as Identifier,
+        Paren_2 as Paren,
         ChainMember,
         CallChain,
         IndexChain,
@@ -397,10 +399,10 @@ type Exists_2 = NodeBase_2 & ChainProp & {
 function expectAny(val: Value | null | undefined): asserts val is Value;
 
 // @public (undocumented)
-type Expression = If | Fn | Match | Block | Exists | Tmpl | Str | Num | Bool | Null | Obj | Arr | Not | And | Or | Identifier | Call | Index | Prop;
+type Expression = If | Fn | Match | Block | Exists | Tmpl | Str | Num | Bool | Null | Obj | Arr | Not | And | Or | Identifier | Paren | Call | Index | Prop;
 
 // @public (undocumented)
-type Expression_2 = Infix | Not_2 | And_2 | Or_2 | If_2 | Fn_2 | Match_2 | Block_2 | Exists_2 | Tmpl_2 | Str_2 | Num_2 | Bool_2 | Null_2 | Obj_2 | Arr_2 | Identifier_2 | Call_2 | // IR
+type Expression_2 = Infix | Not_2 | And_2 | Or_2 | If_2 | Fn_2 | Match_2 | Block_2 | Exists_2 | Tmpl_2 | Str_2 | Num_2 | Bool_2 | Null_2 | Obj_2 | Arr_2 | Identifier_2 | Paren_2 | Call_2 | // IR
 Index_2 | // IR
 Prop_2;
 
@@ -774,6 +776,18 @@ type Or_2 = NodeBase_2 & {
     type: 'or';
     left: Expression_2;
     right: Expression_2;
+};
+
+// @public (undocumented)
+type Paren = NodeBase & {
+    type: 'paren';
+    expr: Expression;
+};
+
+// @public (undocumented)
+type Paren_2 = NodeBase_2 & ChainProp & {
+    type: 'paren';
+    expr: Expression_2;
 };
 
 // @public (undocumented)

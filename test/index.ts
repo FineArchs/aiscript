@@ -1094,6 +1094,22 @@ describe('chain', () => {
 		`);
 		eq(res, STR('kawaii'));
 	});
+
+	test.concurrent('parenthesis and chain', async () => {
+		const res = await exe(`
+		let ai = {
+			chan: ['kawaii']
+			kun: {
+				mo: 'kawaiiyo'
+			}
+		}
+		<: [
+			(ai.chan)[0]
+			(ai.kun).mo
+		]
+		`);
+		eq(res, ARR([STR('kawaii'), STR('kawaiiyo')]));
+	});
 });
 
 describe('Template syntax', () => {

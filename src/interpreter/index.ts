@@ -552,6 +552,10 @@ export class Interpreter {
 				}
 			}
 
+			case 'paren': {
+				return this._eval(node.expr, scope);
+			}
+
 			default: {
 				throw new Error('invalid node type');
 			}

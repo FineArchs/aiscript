@@ -47,12 +47,13 @@ export type Expression =
 	And |
 	Or |
 	Identifier |
+	Paren |
 	Call |
 	Index |
 	Prop;
 
 const expressionTypes = [
-	'if', 'fn', 'match', 'block', 'exists', 'tmpl', 'str', 'num', 'bool', 'null', 'obj', 'arr', 'identifier', 'call', 'index', 'prop',
+	'if', 'fn', 'match', 'block', 'exists', 'tmpl', 'str', 'num', 'bool', 'null', 'obj', 'arr', 'identifier', 'paren', 'call', 'index', 'prop',
 ];
 export function isExpression(x: Node): x is Expression {
 	return expressionTypes.includes(x.type);
@@ -239,6 +240,11 @@ export type Arr = NodeBase & {
 export type Identifier = NodeBase & {
 	type: 'identifier'; // 変数などの識別子
 	name: string; // 変数名
+};
+
+export type Paren = NodeBase & {
+	type: 'paren'; // 括弧
+	expr: Expression; // 中身
 };
 
 // chain node example:

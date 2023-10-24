@@ -153,6 +153,10 @@ export function visitNode(node: Cst.Node, fn: (node: Cst.Node) => Cst.Node): Cst
 			result.right = visitNode(result.right, fn) as (Cst.And | Cst.Or)['right'];
 			break;
 		}
+
+		case 'paren': {
+			result.expr = visitNode(result.expr, fn) as Cst.Paren['expr'];
+		}
 	}
 
 	if (Cst.hasChainProp(result)) {
