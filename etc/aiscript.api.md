@@ -267,7 +267,7 @@ type Fn = NodeBase & {
     type: 'fn';
     args: {
         name: string;
-        optional?: boolean;
+        default?: Expression;
         argType?: TypeSource;
     }[];
     retType?: TypeSource;
@@ -673,8 +673,8 @@ type VFn = VUserFn | VNativeFn;
 // @public (undocumented)
 type VFnArg = {
     name: string;
-    optional?: boolean;
     type?: Type;
+    default?: Value;
 };
 
 // @public
@@ -728,7 +728,7 @@ type VUserFn = VFnBase & {
 
 // Warnings were encountered during analysis:
 //
-// src/interpreter/value.ts:47:2 - (ae-forgotten-export) The symbol "Type" needs to be exported by the entry point index.d.ts
+// src/interpreter/value.ts:46:2 - (ae-forgotten-export) The symbol "Type" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 
