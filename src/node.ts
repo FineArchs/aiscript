@@ -183,6 +183,7 @@ export type Fn = NodeBase & {
 	type: 'fn'; // 関数
 	args: {
 		name: string; // 引数名
+		default?: Expression; // 引数の初期値
 		argType?: TypeSource; // 引数の型
 	}[];
 	retType?: TypeSource; // 戻り値の型

@@ -13,7 +13,7 @@ import type * as Ast from '../../node.js';
  * ```
 */
 export function parseParams(s: ITokenStream): { name: string, argType?: Ast.Node }[] {
-	const items: { name: string, argType?: Ast.Node }[] = [];
+	const items: { name: string, default?: Ast.Node, argType?: Ast.Node }[] = [];
 
 	s.nextWith(TokenKind.OpenParen);
 
@@ -26,13 +26,22 @@ export function parseParams(s: ITokenStream): { name: string, argType?: Ast.Node
 		const name = s.token.value!;
 		s.next();
 
+		let defaultExpr;
+		if ((s.kind as TokenKind) === TokenKind.Question) {
+			s.next();
+			defaultExpr = { type: 'null' } as Ast.Null;
+		}
 		let type;
 		if ((s.kind as TokenKind) === TokenKind.Colon) {
 			s.next();
 			type = parseExpr(s, false);
 		}
+		if ((s.kind as TokenKind) === TokenKind.Eq) {
+			s.next();
+			defaultExpr = parseExpr(s, false);
+		}
 
-		items.push({ name, argType: type });
+		items.push({ name, default: defaultExpr, argType: type });
 
 		// separator
 		switch (s.kind as TokenKind) {
