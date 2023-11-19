@@ -7,7 +7,7 @@ import { AiScriptError, NonAiScriptError, AiScriptNamespaceError, AiScriptIndexO
 import { Scope } from './scope.js';
 import { std } from './lib/std.js';
 import { assertNumber, assertString, assertFunction, assertBoolean, assertObject, assertArray, eq, isObject, isArray, expectAny, reprValue } from './util.js';
-import { NULL, RETURN, unWrapRet, FN_NATIVE, BOOL, NUM, STR, ARR, OBJ, FN, BREAK, CONTINUE, ERROR } from './value.js';
+import { NULL, RETURN, unWrapRet, FN_NATIVE, BOOL, NUM, STR, NAMEDSET, ARR, OBJ, UNION, FN, BREAK, CONTINUE, ERROR } from './value.js';
 import { getPrimProp } from './primitive-props.js';
 import { Variable } from './variable.js';
 import type { Value, VFn } from './value.js';
@@ -434,6 +434,8 @@ export class Interpreter {
 
 			case 'str': return STR(node.value);
 
+			case 'namedSet': return NAMEDSET(node.value);
+
 			case 'arr': return ARR(await Promise.all(node.value.map(item => this._eval(item, scope))));
 
 			case 'obj': {
@@ -443,6 +445,8 @@ export class Interpreter {
 				}
 				return OBJ(obj);
 			}
+
+			case 'arr': return UNION(await Promise.all(node.value.map(item => this._eval(item, scope))));
 
 			case 'prop': {
 				const target = await this._eval(node.target, scope);

@@ -2,6 +2,7 @@ import { TokenKind } from '../token.js';
 import { AiScriptSyntaxError } from '../../error.js';
 import { NODE } from '../utils.js';
 import { parseStatement } from './statements.js';
+import { parseExpr } from './expressions.js';
 
 import type { ITokenStream } from '../streams/token-stream.js';
 import type * as Ast from '../../node.js';
@@ -28,7 +29,7 @@ export function parseParams(s: ITokenStream): { name: string, argType?: Ast.Node
 		let type;
 		if ((s.kind as TokenKind) === TokenKind.Colon) {
 			s.next();
-			type = parseType(s);
+			type = parseExpr(s, false);
 		}
 
 		items.push({ name, argType: type });
@@ -98,75 +99,3 @@ export function parseBlock(s: ITokenStream): Ast.Node[] {
 
 	return steps;
 }
-
-//#region Type
-
-export function parseType(s: ITokenStream): Ast.Node {
-	if (s.kind === TokenKind.At) {
-		return parseFnType(s);
-	} else {
-		return parseNamedType(s);
-	}
-}
-
-/**
- * ```abnf
- * FnType = "@" "(" ParamTypes ")" "=>" Type
- * ParamTypes = [Type *(SEP Type)]
- * ```
-*/
-function parseFnType(s: ITokenStream): Ast.Node {
-	const loc = s.token.loc;
-
-	s.nextWith(TokenKind.At);
-	s.nextWith(TokenKind.OpenParen);
-
-	const params: Ast.Node[] = [];
-	while (s.kind !== TokenKind.CloseParen) {
-		if (params.length > 0) {
-			switch (s.kind as TokenKind) {
-				case TokenKind.Comma: {
-					s.next();
-					break;
-				}
-				default: {
-					throw new AiScriptSyntaxError('separator expected', s.token.loc);
-				}
-			}
-		}
-		const type = parseType(s);
-		params.push(type);
-	}
-
-	s.nextWith(TokenKind.CloseParen);
-	s.nextWith(TokenKind.Arrow);
-
-	const resultType = parseType(s);
-
-	return NODE('fnTypeSource', { args: params, result: resultType }, loc);
-}
-
-/**
- * ```abnf
- * NamedType = IDENT ["<" Type ">"]
- * ```
-*/
-function parseNamedType(s: ITokenStream): Ast.Node {
-	const loc = s.token.loc;
-
-	s.expect(TokenKind.Identifier);
-	const name = s.token.value!;
-	s.next();
-
-	// inner type
-	let inner = null;
-	if (s.kind === TokenKind.Lt) {
-		s.next();
-		inner = parseType(s);
-		s.nextWith(TokenKind.Gt);
-	}
-
-	return NODE('namedTypeSource', { name, inner }, loc);
-}
-
-//#endregion Type

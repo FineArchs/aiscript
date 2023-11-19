@@ -123,6 +123,7 @@ export type Expression =
 	Exists |
 	Tmpl |
 	Str |
+	AnyStr |
 	Num |
 	Bool |
 	Null |
@@ -131,6 +132,7 @@ export type Expression =
 	Not |
 	And |
 	Or |
+	Union |
 	Identifier |
 	Call |
 	Index |
@@ -156,6 +158,12 @@ export type And = NodeBase & {
 
 export type Or = NodeBase & {
 	type: 'or';
+	left: Expression;
+	right: Expression;
+}
+
+export type Union = NodeBase & {
+	type: 'union';
 	left: Expression;
 	right: Expression;
 }
@@ -209,6 +217,11 @@ export type Tmpl = NodeBase & {
 export type Str = NodeBase & {
 	type: 'str'; // 文字列リテラル
 	value: string; // 文字列
+};
+
+export type AnyStr = NodeBase & {
+	type: 'namedSet';	
+	value: 'str';
 };
 
 export type Num = NodeBase & {

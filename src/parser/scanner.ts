@@ -307,6 +307,8 @@ export class Scanner implements ITokenStream {
 					if (!this.stream.eof && (this.stream.char as string) === '|') {
 						this.stream.next();
 						token = TOKEN(TokenKind.Or2, loc, { hasLeftSpacing });
+					} else {
+						token = TOKEN(TokenKind.Or, loc, { hasLeftSpacing });
 					}
 					break;
 				}
@@ -405,6 +407,9 @@ export class Scanner implements ITokenStream {
 			}
 			case 'exists': {
 				return TOKEN(TokenKind.ExistsKeyword, loc, { hasLeftSpacing });
+			}
+			case 'str': {
+				return TOKEN(TokenKind.StrKeyword, loc, { hasLeftSpacing, value });
 			}
 			default: {
 				return TOKEN(TokenKind.Identifier, loc, { hasLeftSpacing, value });

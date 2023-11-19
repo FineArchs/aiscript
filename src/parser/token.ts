@@ -32,6 +32,7 @@ export enum TokenKind {
 	VarKeyword,
 	LetKeyword,
 	ExistsKeyword,
+	StrKeyword,
 
 	/** "!" */
 	Not,
@@ -99,6 +100,8 @@ export enum TokenKind {
 	Hat,
 	/** "{" */
 	OpenBrace,
+	/** "|" */
+	Or,
 	/** "||" */
 	Or2,
 	/** "}" */

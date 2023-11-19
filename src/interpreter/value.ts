@@ -52,6 +52,19 @@ export type VNativeFn = VFnBase & {
 	}) => Value | Promise<Value> | void;
 };
 
+export type VSet = VSimpleSet | VUnion;
+export type VSetBase = {
+	type: 'set';
+};
+export type VNamedSet = VSet & {
+	kind: 'named';
+	value: string;
+};
+export type VUnion = VSet & {
+	kind: 'union';
+	value: Value[];
+};
+
 export type VReturn = {
 	type: 'return';
 	value: Value;
@@ -131,6 +144,18 @@ export const FN = (args: VUserFn['args'], statements: VUserFn['statements'], sco
 export const FN_NATIVE = (fn: VNativeFn['native']): VNativeFn => ({
 	type: 'fn' as const,
 	native: fn,
+});
+
+export const NAMEDSET = (name: VNamedSet['value']): VNamedSet => ({
+	type: 'set' as const;
+	kind: 'named' as const,
+	value: name,
+});
+
+export const UNION = (elems: VUnion['value']): VUnion => ({
+	type: 'set' as const;
+	kind: 'union' as const,
+	value: elems,
 });
 
 // Return文で値が返されたことを示すためのラッパー

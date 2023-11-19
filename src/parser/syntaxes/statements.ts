@@ -1,7 +1,7 @@
 import { AiScriptSyntaxError } from '../../error.js';
 import { CALL_NODE, NODE } from '../utils.js';
 import { TokenKind } from '../token.js';
-import { parseBlock, parseParams, parseType } from './common.js';
+import { parseBlock, parseParams } from './common.js';
 import { parseExpr } from './expressions.js';
 
 import type * as Ast from '../../node.js';
@@ -124,7 +124,7 @@ function parseVarDef(s: ITokenStream): Ast.Node {
 	let type;
 	if ((s.kind as TokenKind) === TokenKind.Colon) {
 		s.next();
-		type = parseType(s);
+		type = parseExpr(s, false);
 	}
 
 	s.nextWith(TokenKind.Eq);
@@ -157,7 +157,7 @@ function parseFnDef(s: ITokenStream): Ast.Node {
 	let type;
 	if ((s.kind as TokenKind) === TokenKind.Colon) {
 		s.next();
-		type = parseType(s);
+		type = parseExpr(s, false);
 	}
 
 	const body = parseBlock(s);

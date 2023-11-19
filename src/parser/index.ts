@@ -2,7 +2,6 @@ import { Scanner } from './scanner.js';
 import { parseTopLevel } from './syntaxes/toplevel.js';
 
 import { validateKeyword } from './plugins/validate-keyword.js';
-import { validateType } from './plugins/validate-type.js';
 
 import type * as Ast from '../node.js';
 
@@ -20,7 +19,6 @@ export class Parser {
 		this.plugins = {
 			validate: [
 				validateKeyword,
-				validateType,
 			],
 			transform: [
 			],

@@ -2,7 +2,7 @@ import { AiScriptSyntaxError } from '../../error.js';
 import { CALL_NODE, NODE } from '../utils.js';
 import { TokenStream } from '../streams/token-stream.js';
 import { TokenKind } from '../token.js';
-import { parseBlock, parseParams, parseType } from './common.js';
+import { parseBlock, parseParams } from './common.js';
 import { parseBlockOrStatement } from './statements.js';
 
 import type * as Ast from '../../node.js';
@@ -49,6 +49,8 @@ const operators: OpInfo[] = [
 	{ opKind: 'infix', kind: TokenKind.And2, lbp: 4, rbp: 5 },
 
 	{ opKind: 'infix', kind: TokenKind.Or2, lbp: 2, rbp: 3 },
+
+	{ opKind: 'infix', kind: TokenKind.Or, lbp: 0, rbp: 1 },
 ];
 
 function parsePrefix(s: ITokenStream, minBp: number): Ast.Node {
@@ -160,6 +162,9 @@ function parseInfix(s: ITokenStream, left: Ast.Node, minBp: number): Ast.Node {
 			case TokenKind.Or2: {
 				return NODE('or', { left, right }, loc);
 			}
+			case TokenKind.Or: {
+				return NODE('union', { left, right }, loc);
+			}
 			default: {
 				throw new AiScriptSyntaxError(`unexpected token: ${TokenKind[op]}`, loc);
 			}
@@ -265,6 +270,11 @@ function parseAtom(s: ITokenStream, isStatic: boolean): Ast.Node {
 		case TokenKind.NullKeyword: {
 			s.next();
 			return NODE('null', { }, loc);
+		}
+		case TokenKind.StrKeyword: {
+			const value = s.token.value!;
+			s.next();
+			return NODE('namedSet', { value }, loc);
 		}
 		case TokenKind.OpenBrace: {
 			return parseObject(s, isStatic);
@@ -383,7 +393,7 @@ function parseFnExpr(s: ITokenStream): Ast.Node {
 	let type;
 	if ((s.kind as TokenKind) === TokenKind.Colon) {
 		s.next();
-		type = parseType(s);
+		type = parseExpr(s, false);
 	}
 
 	const body = parseBlock(s);
