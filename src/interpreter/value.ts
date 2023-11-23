@@ -43,7 +43,7 @@ export type VUserFn = VFnBase & {
 };
 export type VFnArg = {
 	name: string;
-	type?: Type;
+	type?: Value;
 	default?: Value;
 }
 /**
@@ -56,19 +56,6 @@ export type VNativeFn = VFnBase & {
 		registerAbortHandler: (handler: () => void) => void;
 		unregisterAbortHandler: (handler: () => void) => void;
 	}) => Value | Promise<Value> | void;
-};
-
-export type VSet = VSimpleSet | VUnion;
-export type VSetBase = {
-	type: 'set';
-};
-export type VNamedSet = VSet & {
-	kind: 'named';
-	value: string;
-};
-export type VUnion = VSet & {
-	kind: 'union';
-	value: Value[];
 };
 
 export type VReturn = {
@@ -92,6 +79,25 @@ export type VError = {
 	info?: Value;
 };
 
+export type VGroup = {
+	type: 'group';
+	enumable: boolean;
+	members: {
+		null?: 'all';
+		bool?: 'all' | 'true' | 'false';
+		num?: 'all' | Set<number>;
+		str?: 'all' | Set<string>;
+		arr?: 'all';
+		obj?: 'all';
+		fn?: 'all';
+		return?: 'all';
+		break?: 'all';
+		continue?: 'all';
+		error?: 'all';
+		group?: 'all';
+	};
+};
+
 export type Attr = {
 	attr?: {
 		name: string;
@@ -99,7 +105,7 @@ export type Attr = {
 	}[];
 };
 
-export type Value = (VNull | VBool | VNum | VStr | VArr | VObj | VFn | VReturn | VBreak | VContinue | VError) & Attr;
+export type Value = (VNull | VBool | VNum | VStr | VArr | VObj | VFn | VSet | VReturn | VBreak | VContinue | VError) & Attr;
 
 export const NULL = {
 	type: 'null' as const,
@@ -152,18 +158,6 @@ export const FN_NATIVE = (fn: VNativeFn['native']): VNativeFn => ({
 	native: fn,
 });
 
-export const NAMEDSET = (name: VNamedSet['value']): VNamedSet => ({
-	type: 'set' as const;
-	kind: 'named' as const,
-	value: name,
-});
-
-export const UNION = (elems: VUnion['value']): VUnion => ({
-	type: 'set' as const;
-	kind: 'union' as const,
-	value: elems,
-});
-
 // Return文で値が返されたことを示すためのラッパー
 export const RETURN = (v: VReturn['value']): Value => ({
 	type: 'return' as const,
@@ -187,3 +181,37 @@ export const ERROR = (name: string, info?: Value): Value => ({
 	value: name,
 	info: info,
 });
+
+export const NAMEDGROUP = (name: keyof VGroup['members']): VGroup => ({
+	type: 'group' as const,
+	enumable: true,
+	members: {
+		[name]: 'all',
+	},
+});
+
+export const UNION = (elems: Value[]): VGroup => {
+	let enumable = true;
+	let members: VGroup['members'] = {};
+	for (el of elems) {
+		switch (el.type) {
+			case 'null': {
+				members.null = 'all';
+				break;
+			}
+			case 'num':
+			case 'str': {
+				if (members[el.type]) {
+					if (members[el.type] instanceof Set) members[el.type].add(el.value);
+				} else {
+					members[el.type] = new Set([el.value]);
+				}
+			}
+		}
+	}
+	return {
+		type: 'group' as const,
+		enumable,
+		members,
+	};
+};

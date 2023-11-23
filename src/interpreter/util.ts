@@ -1,6 +1,6 @@
 import { AiScriptRuntimeError } from '../error.js';
 import { STR, NUM, ARR, OBJ, NULL, BOOL } from './value.js';
-import type { Value, VStr, VNum, VBool, VFn, VObj, VArr } from './value.js';
+import type { Value, VStr, VNum, VBool, VFn, VObj, VArr, VUnion } from './value.js';
 
 export function expectAny(val: Value | null | undefined): asserts val is Value {
 	if (val == null) {
@@ -97,19 +97,23 @@ export function eq(a: Value, b: Value): boolean {
 export function incl(a: Value, b: Value): boolean {
 	if (eq(a, b)) return true;
 	if (a.type !== 'set') return false;
-	if (a.kind === 'named') switch (a.value) {
+	if (a.kind === 'named') {
 		if (b.type === a.value) return true;
 		if (b.type !== 'set') return false;
 		if (b.kind === 'named') return false;
 		if (b.kind === 'union') return b.value.every(v => incl(a, v));
 	}
 	if (a.kind === 'union') return a.value.some(v => incl(v, b));
+	return false;
 }
 
 /* TODO set of sets
 export function has(a: Value, b: Value): boolean {
 }
 */
+
+export function getUnion(...vals: Value): VUnion {
+}
 
 export function valToString(val: Value, simple = false): string {
 	if (simple) {
@@ -126,6 +130,7 @@ export function valToString(val: Value, simple = false): string {
 		val.type === 'fn' ? '...' :
 		val.type === 'obj' ? '...' :
 		val.type === 'null' ? '' :
+		val.type === 'set' ? val.kind :
 		null;
 
 	return `${val.type}<${label}>`;
@@ -211,6 +216,19 @@ export function reprValue(value: Value, literalLike = false, processedObjects = 
 			return '@( ?? ) { native code }';
 		} else {
 			return `@( ${(value.args.map(v => v.name)).join(', ')} ) { ... }`;
+		}
+	}
+	if (value.type === 'set') {
+		if (value.kind === 'named') return value.value;
+		if (value.kind === 'union') {
+			processedObjects.add(value.value);
+			const content = [];
+
+			for (const item of value.value) {
+				content.push(reprValue(item, true, processedObjects));
+			}
+
+		return content.join(' | ');
 		}
 	}
 

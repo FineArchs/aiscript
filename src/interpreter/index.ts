@@ -6,7 +6,7 @@ import { autobind } from '../utils/mini-autobind.js';
 import { AiScriptError, NonAiScriptError, AiScriptNamespaceError, AiScriptIndexOutOfRangeError, AiScriptRuntimeError } from '../error.js';
 import { Scope } from './scope.js';
 import { std } from './lib/std.js';
-import { assertNumber, assertString, assertFunction, assertBoolean, assertObject, assertArray, eq, isObject, isArray, expectAny, reprValue } from './util.js';
+import { assertNumber, assertString, assertFunction, assertBoolean, assertObject, assertArray, eq, incl, isObject, isArray, expectAny, reprValue } from './util.js';
 import { NULL, RETURN, unWrapRet, FN_NATIVE, BOOL, NUM, STR, NAMEDSET, ARR, OBJ, UNION, FN, BREAK, CONTINUE, ERROR } from './value.js';
 import { getPrimProp } from './primitive-props.js';
 import { Variable } from './variable.js';
@@ -232,10 +232,17 @@ export class Interpreter {
 			const _args = new Map<string, Variable>();
 			for (const i in fn.args) {
 				const argdef = fn.args[i]!;
-				if (!argdef.default) expectAny(args[i]);
+				let argval = null;
+				if (argdef.default) {
+					argval = args[i] ?? argdef.default;
+				} else {
+					argval = args[i];
+					expectAny(argval);
+				}
+				if (argdef.type && !incl(argdef.type, argval)) throw new AiScriptRuntimeError('typecheck failed.');
 				_args.set(argdef.name, {
 					isMutable: true,
-					value: args[i] ?? argdef.default!,
+					value: argval ?? argdef.default,
 				});
 			}
 			const fnScope = fn.scope!.createChildScope(_args);
@@ -436,8 +443,6 @@ export class Interpreter {
 
 			case 'str': return STR(node.value);
 
-			case 'namedSet': return NAMEDSET(node.value);
-
 			case 'arr': return ARR(await Promise.all(node.value.map(item => this._eval(item, scope))));
 
 			case 'obj': {
@@ -448,7 +453,14 @@ export class Interpreter {
 				return OBJ(obj);
 			}
 
-			case 'arr': return UNION(await Promise.all(node.value.map(item => this._eval(item, scope))));
+			case 'namedSet': return NAMEDSET(node.value);
+
+			case 'union': {
+				const [left, right] = await Promise.all([node.left, node.right].map(item => this._eval(item, scope)));
+				if (left.type === 'set') {
+					return UNION();
+				}
+			}
 
 			case 'prop': {
 				const target = await this._eval(node.target, scope);
@@ -493,13 +505,16 @@ export class Interpreter {
 
 			case 'fn': {
 				return FN(
-					await Promise.all(node.args.map(async (arg) => {
+					await Promise.all(node.args.map(arg => Promise.all([
+						arg.default ? this._eval(arg.default, scope) : undefined,
+						arg.argType ? this._eval(arg.argType, scope) : undefined,
+					]).then(([def, type]) => {
 						return {
 							name: arg.name,
-							default: arg.default ? await this._eval(arg.default, scope) : undefined,
-							// type: (TODO)
+							default: def,
+							type,
 						};
-					})),
+					}))),
 					node.children,
 					scope,
 				);

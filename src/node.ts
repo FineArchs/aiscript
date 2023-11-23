@@ -184,9 +184,9 @@ export type Fn = NodeBase & {
 	args: {
 		name: string; // 引数名
 		default?: Expression; // 引数の初期値
-		argType?: TypeSource; // 引数の型
+		argType?: Expression; // 引数の型
 	}[];
-	retType?: TypeSource; // 戻り値の型
+	retType?: Expression; // 戻り値の型
 	children: (Statement | Expression)[]; // 本体処理
 };
 
