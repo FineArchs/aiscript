@@ -1858,6 +1858,21 @@ describe('namespace', () => {
 		eq(res, STR('kawaii'));
 	});
 
+	test.concurrent('recursive', async () => {
+		const res = await exe(`
+		<: Foo:Bar:baz()
+
+		:: Foo {
+			let ai = 'aichan'
+			:: Bar {
+				let kawa = 'kawaii'
+				@baz() { \`{ai} {kawa}\` }
+			}
+		}
+		`);
+		eq(res, STR('aichan kawaii'));
+	});
+
 	test.concurrent('cannot declare mutable variable', async () => {
 		try {
 			await exe(`
