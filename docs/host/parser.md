@@ -1,6 +1,6 @@
 # AiScript 構文解析
-AiScriptコードの構文解析を行い、[AST](#AST)と呼ばれるオブジェクトに変換します。  
-基本的にはstaticメソッドである`Parser.parse(input)`を利用していれば問題ありません。  
+AiScriptコードの構文解析を行い、[AST](#AST)と呼ばれるオブジェクトに変換する方法について説明します。  
+基本的にはstaticメソッドである`Parser.parse(input)`を利用するだけで問題ありません。  
 後述のプラグイン機能を使用する場合はParserクラスのインスタンスを作成する必要があります。  
 
 ### Parser.parse(input)
