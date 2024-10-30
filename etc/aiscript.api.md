@@ -313,12 +313,12 @@ const FALSE: {
 };
 
 // @public (undocumented)
-const FN: (args: VUserFn["args"], statements: VUserFn["statements"], scope: VUserFn["scope"]) => VUserFn;
+const FN: (params: VUserFn["params"], statements: VUserFn["statements"], scope: VUserFn["scope"]) => VUserFn;
 
 // @public (undocumented)
 type Fn = NodeBase & {
     type: 'fn';
-    args: {
+    params: {
         dest: Expression;
         optional: boolean;
         default?: Expression;
@@ -334,7 +334,7 @@ const FN_NATIVE: (fn: VNativeFn["native"]) => VNativeFn;
 // @public (undocumented)
 type FnTypeSource = NodeBase & {
     type: 'fnTypeSource';
-    args: TypeSource[];
+    params: TypeSource[];
     result: TypeSource;
 };
 
@@ -645,6 +645,7 @@ export class Scope {
     exists(name: string): boolean;
     get(name: string): Value;
     getAll(): Map<string, Variable>;
+    getNsPrefix(): string;
     // (undocumented)
     name: string;
     // (undocumented)
@@ -745,7 +746,7 @@ declare namespace values {
         VObj,
         VFn,
         VUserFn,
-        VFnArg,
+        VFnParam,
         VNativeFn,
         VReturn,
         VBreak,
@@ -807,7 +808,7 @@ type VError = {
 type VFn = VUserFn | VNativeFn;
 
 // @public (undocumented)
-type VFnArg = {
+type VFnParam = {
     dest: Expression;
     type?: Type;
     default?: Value;
@@ -857,15 +858,16 @@ type VStr = {
 // @public (undocumented)
 type VUserFn = VFnBase & {
     native?: undefined;
-    args: VFnArg[];
+    name?: string;
+    params: VFnParam[];
     statements: Node_2[];
     scope: Scope;
 };
 
 // Warnings were encountered during analysis:
 //
-// src/interpreter/index.ts:38:4 - (ae-forgotten-export) The symbol "LogObject" needs to be exported by the entry point index.d.ts
-// src/interpreter/value.ts:46:2 - (ae-forgotten-export) The symbol "Type" needs to be exported by the entry point index.d.ts
+// src/interpreter/index.ts:43:4 - (ae-forgotten-export) The symbol "LogObject" needs to be exported by the entry point index.d.ts
+// src/interpreter/value.ts:47:2 - (ae-forgotten-export) The symbol "Type" needs to be exported by the entry point index.d.ts
 
 // (No @packageDocumentation comment for this package)
 

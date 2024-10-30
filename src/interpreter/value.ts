@@ -37,11 +37,12 @@ type VFnBase = {
 };
 export type VUserFn = VFnBase & {
 	native?: undefined; // if (vfn.native) で型アサーション出来るように
-	args: VFnArg[];
+	name?: string;
+	params: VFnParam[];
 	statements: Node[];
 	scope: Scope;
 };
-export type VFnArg = {
+export type VFnParam = {
 	dest: Expression;
 	type?: Type;
 	default?: Value;
@@ -127,9 +128,9 @@ export const ARR = (arr: VArr['value']): VArr => ({
 	value: arr,
 });
 
-export const FN = (args: VUserFn['args'], statements: VUserFn['statements'], scope: VUserFn['scope']): VUserFn => ({
+export const FN = (params: VUserFn['params'], statements: VUserFn['statements'], scope: VUserFn['scope']): VUserFn => ({
 	type: 'fn' as const,
-	args: args,
+	params: params,
 	statements: statements,
 	scope: scope,
 });
