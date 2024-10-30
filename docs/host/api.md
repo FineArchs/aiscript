@@ -15,7 +15,8 @@
 詳しくは→[host/parser.md](./parser.md)  
 
 ### Ast
-Parserによって生成される構文木です。  
+※Typescript用  
+Parserによって生成される構文木(AST)に関連する型がまとめられています。  
 詳しくは→[host/parser.md#AST](./parser.md#AST)  
 
 ### ParserPlugin, PluginType
@@ -32,7 +33,7 @@ ASTを順次読み取り、実行します。
 
 ### Scope
 > [!NOTE]
-> 未整備の要素であり、ホスト側が利用するには機能が足りていないと考えられています。
+> ホスト側が利用する機会はほとんど無いと考えられています。
 
 AiScript内の変数を保持・管理するネスト可能なオブジェクトです。  
 詳しくは→[host/interpreter.md#スコープ](./interpreter.md#スコープ)  
