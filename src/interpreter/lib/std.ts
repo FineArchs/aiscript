@@ -1,7 +1,7 @@
 /* eslint-disable no-empty-pattern */
 import { v4 as uuid } from 'uuid';
 import { NUM, STR, FN_NATIVE, FALSE, TRUE, ARR, NULL, BOOL, OBJ, ERROR } from '../value.js';
-import { assertNumber, assertString, assertBoolean, valToJs, jsToVal, assertFunction, assertObject, eq, expectAny, assertArray, reprValue } from '../util.js';
+import { assertNumber, assertString, assertBoolean, valToJs, jsToVal, assertFunction, assertObject, eq, expectAny, assertArray, reprValue, assertType } from '../util.js';
 import { AiScriptRuntimeError, AiScriptUserError } from '../../error.js';
 import { AISCRIPT_VERSION } from '../../constants.js';
 import { textDecoder } from '../../const.js';
@@ -458,17 +458,18 @@ export const std: Record<string, Value> = {
 	}),
 
 	'Math:gen_rng': FN_NATIVE(async ([seed, options]) => {
-		expectAny(seed);
-		let algo = 'chacha20';
-		if (options?.type === 'obj') {
+		assertType(seed, ['null', 'num', 'str'], ([, got]) => `\`seed\` must be either number or string if specified, but got ${got}.`);
+		const isInSecureContext = 'subtle' in crypto;
+		let algo = isInSecureContext ? 'chacha20' : 'rc4_legacy';
+		if (options) {
+			assertType(options, 'obj', ([, got]) => `\`options\` must be an object if specified, but got ${got}.`);
 			const v = options.value.get('algorithm');
-			if (v?.type !== 'str') throw new AiScriptRuntimeError('`options.algorithm` must be string.');
-			algo = v.value;
+			if (v) {
+				assertType(v, 'str', ([, got]) => `\`options.algorithm\` must be a string, but got ${got}.`);
+				algo = v.value;
+			}
 		}
-		else if (options?.type !== undefined) {
-			throw new AiScriptRuntimeError('`options` must be an object if specified.');
-		}
-		if (seed.type !== 'num' && seed.type !== 'str' && seed.type !== 'null') throw new AiScriptRuntimeError('`seed` must be either number or string if specified.');
+		if (!isInSecureContext && ['rc4', 'chacha20'].includes(algo)) throw new AiScriptRuntimeError(algo + 'cannot be used in non-secure context.');
 		switch (algo) {
 			case 'rc4_legacy':
 				return GenerateLegacyRandom(seed);

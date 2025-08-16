@@ -62,6 +62,29 @@ export function assertArray(val: Value | null | undefined): asserts val is VArr 
 	}
 }
 
+export function assertType<T extends Value['type']>(
+	val: Value | null | undefined,
+	type: T | T[],
+	message?: string | ((expected: string, got: string) => string),
+): asserts val is Value & { type: T } {
+	function err(expected: string): AiScriptRuntimeError {
+		return new AiScriptRuntimeError(
+			(() => {
+				if (typeof message === 'string') return message;
+				const got = val?.type ?? 'nothing';
+				if (message == null) return `Expecting ${expected}, but got ${got}.`;
+				return message(expected, got);
+			})();
+		);
+	}
+
+	if (typeof type === 'string') {
+		if (val == null || type !== val.type) throw err(type);
+	} else {
+		if (val == null || !type.includes(val.type)) throw err('(' + type.join('|') + ')');
+	}
+}
+
 export function isBoolean(val: Value): val is VBool {
 	return val.type === 'bool';
 }
