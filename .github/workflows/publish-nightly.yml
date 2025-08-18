@@ -75,6 +75,14 @@ jobs:
         run: |
           echo 'LAST_COMMITS='$( git log --since '24 hours ago' | wc -c ) >> $GITHUB_ENV
 
+      - name: Bump version
+        run: |
+          if [ "${{ matrix.branch }}" = "dev" ]; then
+            npm version minor
+          elif [ "${{ matrix.branch }}" = "next" ]; then
+            npm version major
+          fi
+
       - name: Prepare Publish
         run: npm run pre-release
 
