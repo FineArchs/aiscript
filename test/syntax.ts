@@ -110,6 +110,25 @@ describe('separator', () => {
 			eq(res, STR('a'));
 		});
 
+		test.concurrent('maximum multi line', async () => {
+			const res = await exe(`
+			let x = 1
+			<: match
+				x
+			{
+				case
+					1
+				=>
+					"a"
+				case
+					2
+				=>
+					"b"
+			}
+			`);
+			eq(res, STR('a'));
+		});
+
 		test.concurrent('multi line with semi colon', async () => {
 			const res = await exe(`
 			let x = 1
@@ -696,6 +715,24 @@ describe('for', () => {
 		eq(res, NUM(55));
 	});
 
+	test.concurrent('Basic (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		for
+			(
+				let
+				i
+				,
+				10
+			)
+		{
+			count += i + 1
+		}
+		<: count
+		`);
+		eq(res, NUM(55));
+	});
+
 	test.concurrent('initial value', async () => {
 		const res = await exe(`
 		var count = 0
@@ -707,7 +744,27 @@ describe('for', () => {
 		eq(res, NUM(65));
 	});
 
-	test.concurrent('wuthout iterator', async () => {
+	test.concurrent('initial value (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		for
+			(
+				let
+				i
+				=
+				2
+				,
+				10
+			)
+		{
+			count += i
+		}
+		<: count
+		`);
+		eq(res, NUM(65));
+	});
+
+	test.concurrent('without iterator', async () => {
 		const res = await exe(`
 		var count = 0
 		for (10) {
@@ -717,11 +774,42 @@ describe('for', () => {
 		`);
 		eq(res, NUM(10));
 	});
+	test.concurrent('without iterator (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		for
+			(
+				10
+			)
+		{
+			count = (count + 1)
+		}
+		<: count
+		`);
+		eq(res, NUM(10));
+	});
+
 
 	test.concurrent('without brackets', async () => {
 		const res = await exe(`
 		var count = 0
 		for let i, 10 {
+			count = (count + i)
+		}
+		<: count
+		`);
+		eq(res, NUM(45));
+	});
+
+	test.concurrent('without brackets (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		for
+			let
+			i
+			,
+			10
+		{
 			count = (count + i)
 		}
 		<: count
@@ -808,6 +896,21 @@ describe('each', () => {
 		`);
 		eq(res, ARR([STR('ai!'), STR('chan!'), STR('kawaii!')]));
 	});
+	test.concurrent('standard (maximum multiline)', async () => {
+		const res = await exe(`
+		let msgs = []
+		each
+			let
+			item
+			,
+			["ai", "chan", "kawaii"]
+		{
+			msgs.push([item, "!"].join())
+		}
+		<: msgs
+		`);
+		eq(res, ARR([STR('ai!'), STR('chan!'), STR('kawaii!')]));
+	});
 
 	test.concurrent('destructuring declaration', async () => {
 		const res = await exe(`
@@ -877,6 +980,19 @@ describe('while', () => {
 		eq(res, NUM(42));
 	});
 
+	test.concurrent('Basic (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		while
+			count < 42
+		{
+			count += 1
+		}
+		<: count
+		`);
+		eq(res, NUM(42));
+	});
+
 	test.concurrent('start false', async () => {
 		const res = await exe(`
 		while false {
@@ -905,6 +1021,20 @@ describe('do-while', () => {
 		do {
 			count += 1
 		} while count < 42
+		<: count
+		`);
+		eq(res, NUM(42));
+	});
+
+	test.concurrent('Basic (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		do
+		{
+			count += 1
+		}
+		while
+			count < 42
 		<: count
 		`);
 		eq(res, NUM(42));
