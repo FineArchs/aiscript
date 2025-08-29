@@ -471,10 +471,13 @@ function parseDoWhile(s: ITokenStream): Ast.Loop {
 	const doStartPos = s.getPos();
 	s.expect(TokenKind.DoKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next();
 	const body = parseBlockOrStatement(s);
 	const whilePos = s.getPos();
+	if (s.is(TokenKind.NewLine)) s.next();
 	s.expect(TokenKind.WhileKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next();
 	const cond = parseExpr(s, false);
 	const endPos = s.getPos();
 
@@ -499,8 +502,10 @@ function parseWhile(s: ITokenStream): Ast.Loop {
 	const startPos = s.getPos();
 	s.expect(TokenKind.WhileKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next();
 	const cond = parseExpr(s, false);
 	const condEndPos = s.getPos();
+	if (s.is(TokenKind.NewLine)) s.next();
 	const body = parseBlockOrStatement(s);
 
 	return NODE('loop', {

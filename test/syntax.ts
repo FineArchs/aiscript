@@ -980,6 +980,19 @@ describe('while', () => {
 		eq(res, NUM(42));
 	});
 
+	test.concurrent('Basic (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		while
+			count < 42
+		{
+			count += 1
+		}
+		<: count
+		`);
+		eq(res, NUM(42));
+	});
+
 	test.concurrent('start false', async () => {
 		const res = await exe(`
 		while false {
@@ -1008,6 +1021,20 @@ describe('do-while', () => {
 		do {
 			count += 1
 		} while count < 42
+		<: count
+		`);
+		eq(res, NUM(42));
+	});
+
+	test.concurrent('Basic (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		do
+		{
+			count += 1
+		}
+		while
+			count < 42
 		<: count
 		`);
 		eq(res, NUM(42));
