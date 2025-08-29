@@ -247,28 +247,35 @@ function parseEach(s: ITokenStream): Ast.Each {
 
 	s.expect(TokenKind.EachKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next();
 
 	if (s.is(TokenKind.OpenParen)) {
 		hasParen = true;
 		s.next();
+		if (s.is(TokenKind.NewLine)) s.next();
 	}
 
 	s.expect(TokenKind.LetKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next();
 
 	const dest = parseDest(s);
+	if (s.is(TokenKind.NewLine)) s.next();
 
 	if (s.is(TokenKind.Comma)) {
 		s.next();
+		if (s.is(TokenKind.NewLine)) s.next();
 	} else {
 		throw new AiScriptSyntaxError('separator expected', s.getPos());
 	}
 
 	const items = parseExpr(s, false);
+	if (s.is(TokenKind.NewLine)) s.next();
 
 	if (hasParen) {
 		s.expect(TokenKind.CloseParen);
 		s.next();
+		if (s.is(TokenKind.NewLine)) s.next();
 	}
 
 	const body = parseBlockOrStatement(s);

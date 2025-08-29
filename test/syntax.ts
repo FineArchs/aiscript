@@ -896,6 +896,21 @@ describe('each', () => {
 		`);
 		eq(res, ARR([STR('ai!'), STR('chan!'), STR('kawaii!')]));
 	});
+	test.concurrent('standard (maximum multiline)', async () => {
+		const res = await exe(`
+		let msgs = []
+		each
+			let
+			item
+			,
+			["ai", "chan", "kawaii"]
+		{
+			msgs.push([item, "!"].join())
+		}
+		<: msgs
+		`);
+		eq(res, ARR([STR('ai!'), STR('chan!'), STR('kawaii!')]));
+	});
 
 	test.concurrent('destructuring declaration', async () => {
 		const res = await exe(`
