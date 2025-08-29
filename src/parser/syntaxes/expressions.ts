@@ -448,38 +448,37 @@ function parseMatch(s: ITokenStream): Ast.Match {
 
 	s.expect(TokenKind.MatchKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next();
+
 	const about = parseExpr(s, false);
+	if (s.is(TokenKind.NewLine)) s.next();
 
 	s.expect(TokenKind.OpenBrace);
 	s.next();
-
-	if (s.is(TokenKind.NewLine)) {
-		s.next();
-	}
+	if (s.is(TokenKind.NewLine)) s.next();
 
 	const qs: Ast.Match['qs'] = [];
-	let x: Ast.Match['default'];
-	if (s.is(TokenKind.CaseKeyword)) {
-		qs.push(parseMatchCase(s));
-		let sep = parseOptionalSeparator(s);
-		while (s.is(TokenKind.CaseKeyword)) {
-			if (!sep) {
-				throw new AiScriptSyntaxError('separator expected', s.getPos());
+	let x: Ast.Match['default'] | undefined;
+	let sep = true;
+	do {
+		switch (s.getTokenKind()) {
+			case TokenKind.CaseKeyword: {
+				qs.push(parseMatchCase(s));
+				break;
 			}
-			qs.push(parseMatchCase(s));
-			sep = parseOptionalSeparator(s);
-		}
-		if (s.is(TokenKind.DefaultKeyword)) {
-			if (!sep) {
-				throw new AiScriptSyntaxError('separator expected', s.getPos());
+			case TokenKind.DefaultKeyword: {
+				if (x != null) throw new AiScriptSyntaxError('multiple defaults not allowed in match expression.', s.getPos());
+				x = parseDefaultCase(s);
+				break;
 			}
-			x = parseDefaultCase(s);
-			parseOptionalSeparator(s);
+			case TokenKind.CloseBrace: {
+				break;
+			}
+			default: {
+				throw unexpectedTokenError(s.getTokenKind(), s.getPos());
+			}
 		}
-	} else if (s.is(TokenKind.DefaultKeyword)) {
-		x = parseDefaultCase(s);
-		parseOptionalSeparator(s);
-	}
+	} while (parseOptionalSeparator(s) || s.is(TokenKind.CloseBrace));
 
 	s.expect(TokenKind.CloseBrace);
 	s.next();
@@ -495,9 +494,12 @@ function parseMatch(s: ITokenStream): Ast.Match {
 function parseMatchCase(s: ITokenStream): Ast.Match['qs'][number] {
 	s.expect(TokenKind.CaseKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next;
 	const q = parseExpr(s, false);
+	if (s.is(TokenKind.NewLine)) s.next;
 	s.expect(TokenKind.Arrow);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next;
 	const a = parseBlockOrStatement(s);
 	return { q, a };
 }
@@ -510,6 +512,7 @@ function parseMatchCase(s: ITokenStream): Ast.Match['qs'][number] {
 function parseDefaultCase(s: ITokenStream): Ast.Match['default'] {
 	s.expect(TokenKind.DefaultKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next;
 	s.expect(TokenKind.Arrow);
 	s.next();
 	return parseBlockOrStatement(s);

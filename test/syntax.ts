@@ -110,6 +110,25 @@ describe('separator', () => {
 			eq(res, STR('a'));
 		});
 
+		test.concurrent('maximum multi line', async () => {
+			const res = await exe(`
+			let x = 1
+			<: match
+				x
+			{
+				case
+					1
+				=>
+					"a"
+				case
+					2
+				=>
+					"b"
+			}
+			`);
+			eq(res, STR('a'));
+		});
+
 		test.concurrent('multi line with semi colon', async () => {
 			const res = await exe(`
 			let x = 1
