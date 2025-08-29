@@ -459,7 +459,6 @@ function parseMatch(s: ITokenStream): Ast.Match {
 
 	const qs: Ast.Match['qs'] = [];
 	let x: Ast.Match['default'] | undefined;
-	let sep = true;
 	do {
 		switch (s.getTokenKind()) {
 			case TokenKind.CaseKeyword: {
@@ -478,7 +477,7 @@ function parseMatch(s: ITokenStream): Ast.Match {
 				throw unexpectedTokenError(s.getTokenKind(), s.getPos());
 			}
 		}
-	} while (parseOptionalSeparator(s) || s.is(TokenKind.CloseBrace));
+	} while (parseOptionalSeparator(s) && !s.is(TokenKind.CloseBrace));
 
 	s.expect(TokenKind.CloseBrace);
 	s.next();
@@ -494,12 +493,12 @@ function parseMatch(s: ITokenStream): Ast.Match {
 function parseMatchCase(s: ITokenStream): Ast.Match['qs'][number] {
 	s.expect(TokenKind.CaseKeyword);
 	s.next();
-	if (s.is(TokenKind.NewLine)) s.next;
+	if (s.is(TokenKind.NewLine)) s.next();
 	const q = parseExpr(s, false);
-	if (s.is(TokenKind.NewLine)) s.next;
+	if (s.is(TokenKind.NewLine)) s.next();
 	s.expect(TokenKind.Arrow);
 	s.next();
-	if (s.is(TokenKind.NewLine)) s.next;
+	if (s.is(TokenKind.NewLine)) s.next();
 	const a = parseBlockOrStatement(s);
 	return { q, a };
 }
@@ -512,7 +511,7 @@ function parseMatchCase(s: ITokenStream): Ast.Match['qs'][number] {
 function parseDefaultCase(s: ITokenStream): Ast.Match['default'] {
 	s.expect(TokenKind.DefaultKeyword);
 	s.next();
-	if (s.is(TokenKind.NewLine)) s.next;
+	if (s.is(TokenKind.NewLine)) s.next();
 	s.expect(TokenKind.Arrow);
 	s.next();
 	return parseBlockOrStatement(s);
