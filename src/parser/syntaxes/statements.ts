@@ -295,41 +295,49 @@ function parseFor(s: ITokenStream): Ast.For {
 
 	s.expect(TokenKind.ForKeyword);
 	s.next();
+	if (s.is(TokenKind.NewLine)) s.next();
 
 	if (s.is(TokenKind.OpenParen)) {
 		hasParen = true;
 		s.next();
+		if (s.is(TokenKind.NewLine)) s.next();
 	}
 
 	if (s.is(TokenKind.LetKeyword)) {
 		// range syntax
 		s.next();
-
-		const identPos = s.getPos();
+		if (s.is(TokenKind.NewLine)) s.next();
 
 		s.expect(TokenKind.Identifier);
+		const identPos = s.getPos();
 		const name = s.getTokenValue();
 		s.next();
+		if (s.is(TokenKind.NewLine)) s.next();
 
 		let _from: Ast.Expression;
 		if (s.is(TokenKind.Eq)) {
 			s.next();
+			if (s.is(TokenKind.NewLine)) s.next();
 			_from = parseExpr(s, false);
 		} else {
 			_from = NODE('num', { value: 0 }, identPos, identPos);
 		}
+		if (s.is(TokenKind.NewLine)) s.next();
 
 		if (s.is(TokenKind.Comma)) {
 			s.next();
+			if (s.is(TokenKind.NewLine)) s.next();
 		} else {
 			throw new AiScriptSyntaxError('separator expected', s.getPos());
 		}
 
 		const to = parseExpr(s, false);
+		if (s.is(TokenKind.NewLine)) s.next();
 
 		if (hasParen) {
 			s.expect(TokenKind.CloseParen);
 			s.next();
+			if (s.is(TokenKind.NewLine)) s.next();
 		}
 
 		const body = parseBlockOrStatement(s);
@@ -344,10 +352,12 @@ function parseFor(s: ITokenStream): Ast.For {
 		// times syntax
 
 		const times = parseExpr(s, false);
+		if (s.is(TokenKind.NewLine)) s.next();
 
 		if (hasParen) {
 			s.expect(TokenKind.CloseParen);
 			s.next();
+			if (s.is(TokenKind.NewLine)) s.next();
 		}
 	
 		const body = parseBlockOrStatement(s);

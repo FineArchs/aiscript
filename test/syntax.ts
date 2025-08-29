@@ -715,6 +715,24 @@ describe('for', () => {
 		eq(res, NUM(55));
 	});
 
+	test.concurrent('Basic (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		for
+			(
+				let
+				i
+				,
+				10
+			)
+		{
+			count += i + 1
+		}
+		<: count
+		`);
+		eq(res, NUM(55));
+	});
+
 	test.concurrent('initial value', async () => {
 		const res = await exe(`
 		var count = 0
@@ -726,7 +744,27 @@ describe('for', () => {
 		eq(res, NUM(65));
 	});
 
-	test.concurrent('wuthout iterator', async () => {
+	test.concurrent('initial value (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		for
+			(
+				let
+				i
+				=
+				2
+				,
+				10
+			)
+		{
+			count += i
+		}
+		<: count
+		`);
+		eq(res, NUM(65));
+	});
+
+	test.concurrent('without iterator', async () => {
 		const res = await exe(`
 		var count = 0
 		for (10) {
@@ -736,11 +774,42 @@ describe('for', () => {
 		`);
 		eq(res, NUM(10));
 	});
+	test.concurrent('without iterator (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		for
+			(
+				10
+			)
+		{
+			count = (count + 1)
+		}
+		<: count
+		`);
+		eq(res, NUM(10));
+	});
+
 
 	test.concurrent('without brackets', async () => {
 		const res = await exe(`
 		var count = 0
 		for let i, 10 {
+			count = (count + i)
+		}
+		<: count
+		`);
+		eq(res, NUM(45));
+	});
+
+	test.concurrent('without brackets (maximum multiline)', async () => {
+		const res = await exe(`
+		var count = 0
+		for
+			let
+			i
+			,
+			10
+		{
 			count = (count + i)
 		}
 		<: count
