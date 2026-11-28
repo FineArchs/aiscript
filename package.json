@@ -1,6 +1,6 @@
 {
 	"type": "module",
-	"name": "@syuilo/aiscript",
+	"name": "@finearchs/aiscript",
 	"version": "1.3.0",
 	"description": "AiScript implementation",
 	"author": "syuilo <syuilotan@yahoo.co.jp>",
