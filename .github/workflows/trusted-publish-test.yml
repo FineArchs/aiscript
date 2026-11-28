@@ -15,13 +15,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: trust-publish-test
 
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 22.x
           registry-url: 'https://registry.npmjs.org'
           package-manager-cache: false  # never use caching in release builds
       - run: npm ci
       - run: npm run build --if-present
-      - run: npm test
+      - run: npm pre-release
       - run: npm publish  # Or: npm stage publish
